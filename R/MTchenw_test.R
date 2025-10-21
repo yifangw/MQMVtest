@@ -1,11 +1,11 @@
 ###########################################################
-# mean-based method:MTplink
+# mean-based method: MTchenw
 ###########################################################
 
-
-#' @title mean-based method:MTplink
+#' @title mean-based method: MTchenw, including a dominant effect of heterozygous (Aa) females
 #' @description
-#' A function to obtain the p value and the test statistic of MTplink for testing the mean difference of the trait value across genotypes.
+#' A function to obtain the p value and the test statistic of MTchenw for testing the mean difference of the trait value across genotypes.
+#'
 #'
 #' @param Genotype A numeric genotype matrix with each row as a different individual and each column as a separate SNP.
 #' Each genotype is coded as 0, 1 or 2 for females and coded as 0 or 1 for males, indicating the number of reference allele.
@@ -22,16 +22,15 @@
 #' For general pedigrees, it is a kinship matrix, indicating the genetic relatedness among individuals within general pedigrees,
 #' calculated using the dedicated method for kinship coefficients of X chromosome provided by the “kinship2” package in R software.
 #'
-#' @return The p value and test statistic of MTplink.
+#' @return The p value and test statistic of MTchenw.
 #' @export
 #'
 #' @examples
-MTplink_test <- function(Genotype,Y,Sex,
-                         Covariate=NULL,
-                         missing_cutoff=0.15,
-                         MAF_Cutoff=NULL,
-                         MGC_Cutoff=20,
-                         kins=kins){
+MTchenw_test <- function(Genotype,Y,Sex,Covariate=NULL,
+                        missing_cutoff=0.15,
+                        MAF_Cutoff=NULL,
+                        MGC_Cutoff=20,
+                        kins=kins){
 
   if (!is.null(kins) && !class(kins)[1] %in% c("matrix", "list")) {
     if (is.null(attr(class(kins), "package")))
@@ -100,20 +99,14 @@ MTplink_test <- function(Genotype,Y,Sex,
     stop("No snp meets the inclusion criteria!")
   }
 
-  myfit_string <- paste(Null_Model_string,'+snp*Sex',sep = "")
+  myfit_string <- paste(Null_Model_string,'+snp*Sex+snp_D',sep = "") #It includes dominance effect terms
 
 
   res <- t(apply(Genotype, 2, function(snp){
 
     # snp <- Genotype[,1]
-    #
-    # cluster <- matrix(0,nrow(Genotype),1)
-    # cluster[Sex==0 & snp==0,1] <- 1
-    # cluster[Sex==0 & snp!=0 & snp!=2,1] <- 2
-    # cluster[Sex==0 & snp==2,1] <- 3
-    # cluster[Sex==1 & snp==0,1] <- 4
-    # cluster[Sex==1 & snp!=0,1] <- 5
-
+    # snp_D <- ifelse(Sex==0 & snp==1,1,0) #dominance effect
+    snp_D <- ifelse(Sex==1 & snp==1,1,0) #dominance effect
 
     cluster <- matrix(0,nrow(Genotype),1)
     cluster[Sex==1 & snp==0,1] <- 1
@@ -122,18 +115,18 @@ MTplink_test <- function(Genotype,Y,Sex,
     cluster[Sex==0 & snp==0,1] <- 4
     cluster[Sex==0 & snp!=0,1] <- 5
 
+    df4<- data.frame(num=c(1:nrow(Genotype)),Phedata,snp,snp_D,Sex,cluster=cluster)
 
-    # kins=GRM
-    df3<- data.frame(num=c(1:nrow(Genotype)),Phedata,snp,Sex,cluster=cluster)
-    lmm_plink <- glmmkin(fixed=myfit_string, data=df3, kins=kins,id="num",groups="cluster",
-                         family=gaussian(link="identity"),na.action = na.exclude)
-    coef_plink <- lmm_plink$coefficients[c("snp","snp:Sex")]
-    cov_plink <- lmm_plink$cov[c("snp","snp:Sex"),c("snp","snp:Sex")]
-    wald_plink <- t(coef_plink)%*%solve(cov_plink)%*%coef_plink
-    plink_p <- pchisq(q = wald_plink,df = 2,lower.tail = FALSE) #chi-square(2)
+    #kins=GRM
+    lmm_chen <- glmmkin(fixed=myfit_string,data = df4,kins=kins,id="num",groups="cluster",
+                        family=gaussian(link="identity"),na.action = na.exclude)
+    coef_chen <- lmm_chen$coefficients[c("snp","snp_D","snp:Sex")]
+    cov_chen <- lmm_chen$cov[c("snp","snp_D","snp:Sex"),c("snp","snp_D","snp:Sex")]
+    wald_chen <- t(coef_chen)%*%solve(cov_chen)%*%coef_chen
+    chen_p <- pchisq(q = wald_chen,df = 3,lower.tail = FALSE) #chi-square(3)
 
-    res <- c(wald_plink,plink_p)
-    names(res) <- c('MTplink.test','MTplink.p')
+    res <- c(wald_chen,chen_p)
+    names(res) <- c('MTchenw.test','MTchenw.p')
     return(res)
   }))
   SNPnames <- rownames(res)
@@ -141,9 +134,9 @@ MTplink_test <- function(Genotype,Y,Sex,
     SNPnames <- paste('snp',seq(ncol(Genotype)),sep = "")
   }
   Tstat <- data.frame(SNP=SNPnames,res[,1,drop=F],row.names = NULL)
-  colnames(Tstat) <- c('SNP','MTplink')
+  colnames(Tstat) <- c('SNP','MTchenw')
   pvalue <- data.frame(SNP=SNPnames,res[,2,drop=F],row.names = NULL)
-  colnames(pvalue) <- c('SNP','MTplink')
+  colnames(pvalue) <- c('SNP','MTchenw')
   results <- list(Tstat=Tstat,pvalue=pvalue)
   return(results)
 }
