@@ -41,26 +41,26 @@ For general pedigrees, it is a kinship matrix, indicating the genetic relatednes
 calculated using the dedicated method for kinship coefficients of X chromosome provided by the “kinship2” package in R software.}
 
 \item{method}{Optional: A character string indicating which kind of association tests is to be conducted.
-There are four options: "location", "scale", "joint" (default) and "all".
-method="location": MQXcat and MQZmax; method="scale": MwM3VNA; method="joint": MQMVXcat and MQMVZmax;
+There are four options: "mean", "variance", "joint" (default) and "all".
+method="mean": MQXcat and MQZmax; method="variance": MwM3VNA; method="joint": MQMVXcat and MQMVZmax;
 method="all": all of the above association tests.}
 }
 \value{
 The p values and the test statistics of association tests selected by the method option for each SNP.
 }
 \description{
-A function to obtain the p values and the test statistics of the location_test (i.e., MQXcat and MQZmax),
-the scale_test (i.e.,MwM3VNA), the MQMV_test (i.e., MQMVXcat and MQMVZmax) or all.
+A function to obtain the p values and the test statistics of the mean_test (i.e., MQXcat and MQZmax),
+the variance_test (i.e.,MwM3VNA), the MQMV_test (i.e., MQMVXcat and MQMVZmax) or all.
 MQMVXcat and MQMVZmax are designed to test for both the mean differences and the variance heterogeneity of the trait value across genotypes.
 MQXcat and MQZmax are used for testing the mean differences of the trait value only.
 MwM3VNA is for testing the variance heterogeneity only.
 }
 \examples{
   MQMV_test(Genotype,Y,Sex,
-Covariate=Data[,"Age"],
-missing_cutoff=0.15,
-MAF_Cutoff=NULL,
-MGC_Cutoff=20,
-kins=GRM,
-method='joint')
+                      Covariate=mixed[,"Age"],
+                      missing_cutoff=0.15,
+                      MAF_Cutoff=NULL,
+                      MGC_Cutoff=20,
+                      kins=GRM,
+                      method='joint')
 }

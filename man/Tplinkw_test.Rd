@@ -37,3 +37,10 @@ The p value and test statistic of Tplinknw.
 #' Similar to the MTplink method, Tplinkw is an approach designed for unrelated individuals and
 therefore does not incorporate a kinship matrix to account for correlations between individuals.
 }
+\examples{
+Tplinkw_test(Genotype,Y,Sex,
+                       Covariate=unrelated[,"Age"],
+                       missing_cutoff=0.15,
+                       MAF_Cutoff=NULL,
+                       MGC_Cutoff=20)
+}

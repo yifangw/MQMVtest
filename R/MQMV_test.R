@@ -8,8 +8,8 @@
 #'
 #'
 #'@description
-#'A function to obtain the p values and the test statistics of the location_test (i.e., MQXcat and MQZmax),
-#'the scale_test (i.e.,MwM3VNA), the MQMV_test (i.e., MQMVXcat and MQMVZmax) or all.
+#'A function to obtain the p values and the test statistics of the mean_test (i.e., MQXcat and MQZmax),
+#'the variance_test (i.e.,MwM3VNA), the MQMV_test (i.e., MQMVXcat and MQMVZmax) or all.
 #'MQMVXcat and MQMVZmax are designed to test for both the mean differences and the variance heterogeneity of the trait value across genotypes.
 #'MQXcat and MQZmax are used for testing the mean differences of the trait value only.
 #'MwM3VNA is for testing the variance heterogeneity only.
@@ -28,20 +28,20 @@
 #' For general pedigrees, it is a kinship matrix, indicating the genetic relatedness among individuals within general pedigrees,
 #' calculated using the dedicated method for kinship coefficients of X chromosome provided by the “kinship2” package in R software.
 #' @param method  Optional: A character string indicating which kind of association tests is to be conducted.
-#' There are four options: "location", "scale", "joint" (default) and "all".
-#' method="location": MQXcat and MQZmax; method="scale": MwM3VNA; method="joint": MQMVXcat and MQMVZmax;
+#' There are four options: "mean", "variance", "joint" (default) and "all".
+#' method="mean": MQXcat and MQZmax; method="variance": MwM3VNA; method="joint": MQMVXcat and MQMVZmax;
 #' method="all": all of the above association tests.
 #'
 #' @return The p values and the test statistics of association tests selected by the method option for each SNP.
 #' @export
 #'
 #' @examples   MQMV_test(Genotype,Y,Sex,
-#' Covariate=Data[,"Age"],
-#' missing_cutoff=0.15,
-#' MAF_Cutoff=NULL,
-#' MGC_Cutoff=20,
-#' kins=GRM,
-#' method='joint')
+#'                       Covariate=mixed[,"Age"],
+#'                       missing_cutoff=0.15,
+#'                       MAF_Cutoff=NULL,
+#'                       MGC_Cutoff=20,
+#'                       kins=GRM,
+#'                       method='joint')
 MQMV_test <- function(Genotype,Y,Sex,
                       Covariate=NULL,
                       missing_cutoff=0.15,
@@ -50,79 +50,79 @@ MQMV_test <- function(Genotype,Y,Sex,
                       kins=NULL,
                       method='joint'){
 
-  if(method=='location') {
-    location <- location_test(Genotype,Y,Sex,
+  if(method=='mean') {
+    mean <- mean_test(Genotype,Y,Sex,
                               Covariate,
                               missing_cutoff,
                               MAF_Cutoff,
                               MGC_Cutoff,
                               kins)
-    return(location)
-  } else if(method=='scale'){
-    scale <- scale_test(Genotype,Y,Sex,
+    return(mean)
+  } else if(method=='variance'){
+    variance <- variance_test(Genotype,Y,Sex,
                         Covariate,
                         missing_cutoff,
                         MAF_Cutoff,
                         MGC_Cutoff,
                         kins)
-    return(scale)
+    return(variance)
   } else if(method=='joint'){
-    location <- location_test(Genotype,Y,Sex,Covariate,
+    mean <- mean_test(Genotype,Y,Sex,Covariate,
                               missing_cutoff,
                               MAF_Cutoff,
                               MGC_Cutoff,
                               kins)
-    scale <- scale_test(Genotype,Y,Sex,
+    variance <- variance_test(Genotype,Y,Sex,
                         Covariate,
                         missing_cutoff,
                         MAF_Cutoff,
                         MGC_Cutoff,
                         kins)
-    MQMV <- matrix(nrow = nrow(location$pvalue),ncol=4)
-    log_location <- log(location$pvalue[,-1,drop=F])
-    log_scale <- log(scale$pvalue[,-1,drop=F])
+    MQMV <- matrix(nrow = nrow(mean$pvalue),ncol=4)
+    log_mean <- log(mean$pvalue[,-1,drop=F])
+    log_variance <- log(variance$pvalue[,-1,drop=F])
     for (i in 1:2) {
-      MQMV[,i] <- -2*(log_location[,i]+log_scale[,1]) #i=1,MQMVXcat;i=2,MQMVZmax
+      MQMV[,i] <- -2*(log_mean[,i]+log_variance[,1]) #i=1,MQMVXcat;i=2,MQMVZmax
       MQMV[,i+2] <- pchisq(MQMV[,i],df = 4, lower.tail = FALSE)
     }
     colnames(MQMV) <- c('MQMVXcat.test','MQMVZmax.test','MQMVXcat.p','MQMVZmax.p')
-    Tstat <- data.frame(SNP=location$pvalue[,1],MQMV[,1:2,drop=F],row.names = NULL)
+    Tstat <- data.frame(SNP=mean$pvalue[,1],MQMV[,1:2,drop=F],row.names = NULL)
     colnames(Tstat) <- c('SNP','MQMVXcat','MQMVZmax')
-    pvalue <- data.frame(SNP=location$pvalue[,1],MQMV[,3:4,drop=F],row.names = NULL)
+    pvalue <- data.frame(SNP=mean$pvalue[,1],MQMV[,3:4,drop=F],row.names = NULL)
     colnames(pvalue) <- c('SNP','MQMVXcat','MQMVZmax')
     results <- list(Tstat=Tstat,pvalue=pvalue)
     return(results)
   }else if(method=='all'){
-    location <- location_test(Genotype,Y,Sex,
+    mean <- mean_test(Genotype,Y,Sex,
                               Covariate,
                               missing_cutoff,
                               MAF_Cutoff,
                               MGC_Cutoff,
                               kins)
-    scale <- scale_test(Genotype,Y,Sex,
+    variance <- variance_test(Genotype,Y,Sex,
                         Covariate,
                         missing_cutoff,
                         MAF_Cutoff,
                         MGC_Cutoff,
                         kins)
-    MQMV <- matrix(nrow = nrow(location$pvalue),ncol=4)
-    log_location <- log(location$pvalue[,-1,drop=F])
-    log_scale <- log(scale$pvalue[,-1,drop=F])
+    MQMV <- matrix(nrow = nrow(mean$pvalue),ncol=4)
+    log_mean <- log(mean$pvalue[,-1,drop=F])
+    log_variance <- log(variance$pvalue[,-1,drop=F])
     for (i in 1:2) {
-      MQMV[,i] <- -2*(log_location[,i]+log_scale[,1])
+      MQMV[,i] <- -2*(log_mean[,i]+log_variance[,1])
       MQMV[,i+2] <- pchisq(MQMV[,i],df = 4, lower.tail = FALSE)
     }
     colnames(MQMV) <- c('MQMVXcat.test','MQMVZmax.test','MQMVXcat.p','MQMVZmax.p')
-    Tstat <- data.frame(location$Tstat,
-                        scale$Tstat[,-1,drop=F],
+    Tstat <- data.frame(mean$Tstat,
+                        variance$Tstat[,-1,drop=F],
                         MQMV[,1:2,drop=F],
                         row.names = NULL)
-    colnames(Tstat) <- c('SNP','MQXcat.fisher','MQZmax.fisher','MwM3VNA3.3','MQMVXcat.fisher','MQMVZmax.fisher')
-    pvalue <- data.frame(location$pvalue,
-                         scale$pvalue[,-1,drop=F],
+    colnames(Tstat) <- c('SNP','MQXcat','MQZmax','MwM3VNA','MQMVXcat','MQMVZmax')
+    pvalue <- data.frame(mean$pvalue,
+                         variance$pvalue[,-1,drop=F],
                          MQMV[,3:4,drop=F],
                          row.names = NULL)
-    colnames(pvalue) <- c('SNP','MQXcat.fisher','MQZmax.fisher','MwM3VNA3.3','MQMVXcat.fisher','MQMVZmax.fisher')
+    colnames(pvalue) <- c('SNP','MQXcat','MQZmax','MwM3VNA','MQMVXcat','MQMVZmax')
     results <- list(Tstat=Tstat,pvalue=pvalue)
     return(results)
   }

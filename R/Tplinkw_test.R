@@ -20,7 +20,11 @@
 #' @return The p value and test statistic of Tplinknw.
 #' @export
 #'
-#' @examples
+#' @examples Tplinkw_test(Genotype,Y,Sex,
+#'                        Covariate=unrelated[,"Age"],
+#'                        missing_cutoff=0.15,
+#'                        MAF_Cutoff=NULL,
+#'                        MGC_Cutoff=20)
 Tplinkw_test <- function(Genotype,Y,Sex,
                          Covariate=NULL,
                          missing_cutoff=0.15,
@@ -134,39 +138,39 @@ Tplinkw_test <- function(Genotype,Y,Sex,
     # df3<- data.frame(num=c(1:nrow(Genotype)),Phedata,snp,Sex,cluster=cluster)
 
 
-    lm_plink <- lm(full_formula, data = complete_data)
+    lm_Tplinkw <- lm(full_formula, data = complete_data)
 
 
     # lm_null <- lm(Y ~ Sex + AGE + PC1 + PC2 + PC3 + PC4 + PC5 +
     #                 PC6 + PC7 + PC8 + PC9 + PC10,
     #               data = complete_data)
     # weights
-    inv_var_plink <- tapply(resid(lm_plink),
+    inv_var_Tplinkw <- tapply(resid(lm_Tplinkw),
                             complete_data$cluster,
                             function(x){1/var(x,na.rm=T)})
     # Handle the NA weights
-    if(any(is.na(inv_var_plink))) {
+    if(any(is.na(inv_var_Tplinkw))) {
 
-      overall_var <- var(resid(lm_plink), na.rm=TRUE)
-      inv_var_plink[is.na(inv_var_plink)] <- 1/overall_var
+      overall_var <- var(resid(lm_Tplinkw), na.rm=TRUE)
+      inv_var_Tplinkw[is.na(inv_var_Tplinkw)] <- 1/overall_var
     }
 
 
-    w_plink <- ifelse(complete_data$cluster==1, inv_var_plink[1],
-                      ifelse(complete_data$cluster==2, inv_var_plink[2],
-                             ifelse(complete_data$cluster==3, inv_var_plink[3],
-                                    ifelse(complete_data$cluster==4, inv_var_plink[4],
-                                           inv_var_plink[5]))))
+    w_Tplinkw <- ifelse(complete_data$cluster==1, inv_var_Tplinkw[1],
+                      ifelse(complete_data$cluster==2, inv_var_Tplinkw[2],
+                             ifelse(complete_data$cluster==3, inv_var_Tplinkw[3],
+                                    ifelse(complete_data$cluster==4, inv_var_Tplinkw[4],
+                                           inv_var_Tplinkw[5]))))
 
 
-    lm_weighted <- lm(full_formula, weights = w_plink, data = complete_data)
-    lm_null_weighted <- lm(null_formula, weights = w_plink, data = complete_data)
+    lm_weighted <- lm(full_formula, weights = w_Tplinkw, data = complete_data)
+    lm_null_weighted <- lm(null_formula, weights = w_Tplinkw, data = complete_data)
 
     # LRT
-    plinkw_p <- lrtest(lm_weighted, lm_null_weighted)$Pr[2]
+    Tplinkw_p <- lrtest(lm_weighted, lm_null_weighted)$Pr[2]
 
-    res <- c(NA,plinkw_p)
-    names(res) <- c('plink.test','plinkw_p')
+    res <- c(NA,Tplinkw_p)
+    names(res) <- c('Tplinkw.test','Tplinkw_p')
     return(res)
   }))
 

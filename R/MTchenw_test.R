@@ -25,7 +25,12 @@
 #' @return The p value and test statistic of MTchenw.
 #' @export
 #'
-#' @examples
+#' @examples MTchenw_test(Genotype,Y,Sex,
+#'                        Covariate=mixed[,"Age"],
+#'                        missing_cutoff=0.15,
+#'                        MAF_Cutoff=NULL,
+#'                        MGC_Cutoff=20,
+#'                        kins=GRM)
 MTchenw_test <- function(Genotype,Y,Sex,Covariate=NULL,
                         missing_cutoff=0.15,
                         MAF_Cutoff=NULL,

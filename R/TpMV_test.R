@@ -24,7 +24,12 @@
 #' @return The p values and the test statistics of association tests selected by the method option for each SNP.
 #' @export
 #'
-#' @examples
+#' @examples TpMV_test(Genotype,Y,Sex,
+#'                     Covariate = unrelated[,"Age"],
+#'                     missing_cutoff = 0.15,
+#'                     MGC_Cutoff = 2,
+#'                     method = 'all')
+#'
 TpMV_test <- function(Genotype,Y,Sex,
                       Covariate=NULL,
                       missing_cutoff=0.15,
@@ -80,12 +85,12 @@ TpMV_test <- function(Genotype,Y,Sex,
                         scale$Tstat[,-1,drop=F],
                         TpMV_ind[,1,drop=F],
                         row.names = NULL)
-    colnames(Tstat) <- c('SNP','Tplinkw','wM3VNA3.3','TpMV')
+    colnames(Tstat) <- c('SNP','Tplinkw','wM3VNA','TpMV')
     pvalue <- data.frame(Tplinkw$pvalue,
                          scale$pvalue[,-1,drop=F],
                          TpMV_ind[,2,drop=F],
                          row.names = NULL)
-    colnames(pvalue) <- c('SNP','Tplinkw','wM3VNA3.3','TpMV')
+    colnames(pvalue) <- c('SNP','Tplinkw','wM3VNA','TpMV')
     results <- list(Tstat=Tstat,pvalue=pvalue)
     return(results)
   }

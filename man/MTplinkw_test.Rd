@@ -44,3 +44,11 @@ The p value and test statistic of MTplinkw.
 \description{
 A function to obtain the p value and the test statistic of MTplinkw for testing the mean difference of the trait value across genotypes.
 }
+\examples{
+MTplinkw_test(Genotype,Y,Sex,
+                        Covariate=mixed[,"Age"],
+                        missing_cutoff=0.15,
+                        MAF_Cutoff=NULL,
+                        MGC_Cutoff=20,
+                        kins=GRM)
+}

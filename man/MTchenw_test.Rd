@@ -44,3 +44,11 @@ The p value and test statistic of MTchenw.
 \description{
 A function to obtain the p value and the test statistic of MTchenw for testing the mean difference of the trait value across genotypes.
 }
+\examples{
+MTchenw_test(Genotype,Y,Sex,
+                       Covariate=mixed[,"Age"],
+                       missing_cutoff=0.15,
+                       MAF_Cutoff=NULL,
+                       MGC_Cutoff=20,
+                       kins=GRM)
+}

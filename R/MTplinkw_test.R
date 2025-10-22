@@ -25,7 +25,12 @@
 #' @return The p value and test statistic of MTplinkw.
 #' @export
 #'
-#' @examples
+#' @examples MTplinkw_test(Genotype,Y,Sex,
+#'                         Covariate=mixed[,"Age"],
+#'                         missing_cutoff=0.15,
+#'                         MAF_Cutoff=NULL,
+#'                         MGC_Cutoff=20,
+#'                         kins=GRM)
 MTplinkw_test <- function(Genotype,Y,Sex,
                          Covariate=NULL,
                          missing_cutoff=0.15,

@@ -41,3 +41,11 @@ The p values and the test statistics of association tests selected by the method
 \description{
 A function to obtain the p value and the test statistics of the Tchenw_test (i.e., Tchenw), the scale test (i.e.,wM3VNA) from the "QMVtest" package, the TcMV_test(i.e., TcMV) or all.
 }
+\examples{
+TcMV_test(Genotype,Y,Sex,
+                    Covariate=unrelated[,"Age"],
+                    missing_cutoff=0.15,
+                    MAF_Cutoff=NULL,
+                    MGC_Cutoff=20,
+                    method='joint')
+}

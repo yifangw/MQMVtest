@@ -20,7 +20,11 @@
 #' @return The p value and test statistic of Tchenw.
 #' @export
 #'
-#' @examples
+#' @examples Tchenw_test(Genotype,Y,Sex,
+#'                       Covariate=unrelated[,"Age"],
+#'                       missing_cutoff=0.15,
+#'                       MAF_Cutoff=NULL,
+#'                       MGC_Cutoff=20)
 Tchenw_test <- function(Genotype,Y,Sex,Covariate=NULL, missing_cutoff=0.15,MAF_Cutoff=NULL,MGC_Cutoff=20){
 
   if (missing(Genotype)){
@@ -134,40 +138,40 @@ Tchenw_test <- function(Genotype,Y,Sex,Covariate=NULL, missing_cutoff=0.15,MAF_C
     }
 
     # fit LMM
-    lmm_chen <- lm(full_formula, data = complete_data)
+    lmm_Tchenw <- lm(full_formula, data = complete_data)
 
     # weights
-    inv_var_chen <- tapply(resid(lmm_chen),
+    inv_var_Tchenw <- tapply(resid(lmm_Tchenw),
                            complete_data$cluster,
                            function(x){1/var(x, na.rm=TRUE)})
 
     # Handle the NA weight
-    if(any(is.na(inv_var_chen))) {
-      overall_var <- var(resid(lmm_chen), na.rm=TRUE)
-      inv_var_chen[is.na(inv_var_chen)] <- 1/overall_var
+    if(any(is.na(inv_var_Tchenw))) {
+      overall_var <- var(resid(lmm_Tchenw), na.rm=TRUE)
+      inv_var_Tchenw[is.na(inv_var_Tchenw)] <- 1/overall_var
     }
 
     # Assign weights to each observation
-    w_chen <- numeric(nrow(complete_data))
+    w_Tchenw <- numeric(nrow(complete_data))
     for(i in 1:5) {
-      w_chen[complete_data$cluster == i] <- inv_var_chen[i]
+      w_Tchenw[complete_data$cluster == i] <- inv_var_Tchenw[i]
     }
 
     # LRT model
-    lm_weighted <- lm(full_formula, weights = w_chen, data = complete_data)
-    lm_null_weighted <- lm(null_formula, weights = w_chen, data = complete_data)
+    lm_weighted <- lm(full_formula, weights = w_Tchenw, data = complete_data)
+    lm_null_weighted <- lm(null_formula, weights = w_Tchenw, data = complete_data)
 
     # conduct LRT
     if(requireNamespace("lmtest", quietly = TRUE)) {
-      chenw_p <- lmtest::lrtest(lm_weighted, lm_null_weighted)$Pr[2]
+      Tchenw_p <- lmtest::lrtest(lm_weighted, lm_null_weighted)$Pr[2]
     } else {
       # Using anova to perform LRT
       anova_result <- anova(lm_null_weighted, lm_weighted, test="LRT")
-      chenw_p <- anova_result$`Pr(>Chi)`[2]
+      Tchenw_p <- anova_result$`Pr(>Chi)`[2]
     }
 
-    res <- c(NA, chenw_p)
-    names(res) <- c('chen.test', 'chenw_p')
+    res <- c(NA, Tchenw_p)
+    names(res) <- c('Tchenw.test', 'Tchenw_p')
     return(res)
   }))
 
@@ -177,10 +181,10 @@ Tchenw_test <- function(Genotype,Y,Sex,Covariate=NULL, missing_cutoff=0.15,MAF_C
   }
 
   Tstat <- data.frame(SNP=SNPnames, res[,1,drop=F], row.names=NULL)
-  colnames(Tstat) <- c('SNP', 'chen')
+  colnames(Tstat) <- c('SNP', 'Tchenw')
 
   pvalue <- data.frame(SNP=SNPnames, res[,2,drop=F], row.names=NULL)
-  colnames(pvalue) <- c('SNP', 'chen')
+  colnames(pvalue) <- c('SNP', 'Tchenw')
 
   results <- list(Tstat=Tstat, pvalue=pvalue)
   return(results)

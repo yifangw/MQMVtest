@@ -41,3 +41,11 @@ The p values and the test statistics of association tests selected by the method
 \description{
 A function to obtain the p value and the test statistics of the Tplinkw_test (i.e., Tplinkw), the scale test (i.e.,wM3VNA) from the "QMVtest" package, the TpMV_test(i.e., TpMV) or all.
 }
+\examples{
+TpMV_test(Genotype,Y,Sex,
+                    Covariate = unrelated[,"Age"],
+                    missing_cutoff = 0.15,
+                    MGC_Cutoff = 2,
+                    method = 'all')
+
+}

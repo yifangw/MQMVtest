@@ -22,7 +22,12 @@
 #' @return The p values and the test statistics of association tests selected by the method option for each SNP.
 #' @export
 #'
-#' @examples
+#' @examples TcMV_test(Genotype,Y,Sex,
+#'                     Covariate=unrelated[,"Age"],
+#'                     missing_cutoff=0.15,
+#'                     MAF_Cutoff=NULL,
+#'                     MGC_Cutoff=20,
+#'                     method='joint')
 TcMV_test <- function(Genotype,Y,Sex,
                       Covariate=NULL,
                       missing_cutoff=0.15,
@@ -65,7 +70,7 @@ TcMV_test <- function(Genotype,Y,Sex,
     results <- list(Tstat=Tstat,pvalue=pvalue)
     return(results)
   }else if(method=='all'){
-    Tchen_ind <- Tchenw_test(Genotype,Y,Sex,Covariate)
+    Tchenw <- Tchenw_test(Genotype,Y,Sex,Covariate)
 
     scale <- scale_test(Genotype,Y,Sex,Covariate,
                         missing_cutoff,
@@ -81,12 +86,12 @@ TcMV_test <- function(Genotype,Y,Sex,
                         scale$Tstat[,-1,drop=F],
                         TcMV_ind[,1,drop=F],
                         row.names = NULL)
-    colnames(Tstat) <- c('SNP','Tchenw','wM3VNA3.3','TcMV')
+    colnames(Tstat) <- c('SNP','Tchenw','wM3VNA','TcMV')
     pvalue <- data.frame(Tchenw$pvalue,
                          scale$pvalue[,-1,drop=F],
                          TcMV_ind[,2,drop=F],
                          row.names = NULL)
-    colnames(pvalue) <- c('SNP','Tchenw','wM3VNA3.3','TcMV')
+    colnames(pvalue) <- c('SNP','Tchenw','wM3VNA','TcMV')
     results <- list(Tstat=Tstat,pvalue=pvalue)
     return(results)
   }

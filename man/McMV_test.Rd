@@ -32,27 +32,27 @@ Each genotype is coded as 0, 1 or 2 for females and coded as 0 or 1 for males, i
 
 \item{MGC_Cutoff}{Cutoff for the minimum genotype count in either females or males.}
 
-\item{kins}{For the mixed data, kins is a block matrix, interpreted as the genetic relatedness among these individuals,
+\item{kins}{For the mixed data, kins=GRM is a block matrix, interpreted as the genetic relatedness among these individuals,
 including general pedigrees and unrelated individuals.
-For general pedigrees, it is a kinship matrix, indicating the genetic relatedness among individuals within general pedigrees,
+For general pedigrees, GRM is a kinship matrix, indicating the genetic relatedness among individuals within general pedigrees,
 calculated using the dedicated method for kinship coefficients of X chromosome provided by the “kinship2” package in R software.}
 
 \item{method}{Optional: A character string indicating which kind of association tests is to be conducted.
-There are four options: "MTchen", "scale", "joint" (default) and "all".
-method="MTchen": MTchen; method="scale": MwM3VNA; method="joint": McMV; method="all": all of the above association tests.}
+There are four options: "MTchenw", "variance", "joint" (default) and "all".
+method="MTchenw": MTchenw; method="variance": MwM3VNA; method="joint": McMV; method="all": all of the above association tests.}
 }
 \value{
 The p values and the test statistics of association tests selected by the method option for each SNP.
 }
 \description{
-A function to obtain the p value and the test statistics of the MTchen_test (i.e., MTchen), the scale test (i.e.,MwM3VNA), the McMV_test(i.e., McMV) or all.
+A function to obtain the p value and the test statistics of the MTchenw_test (i.e., MTchenw), the variance test (i.e.,MwM3VNA), the McMV_test(i.e., McMV) or all.
 }
 \examples{
 McMV_test(Genotype,Y,Sex,
-Covariate=Data[,"Age"],
-missing_cutoff=0.15,
-MAF_Cutoff=NULL,
-MGC_Cutoff=20,
-kins=GRM,
-method='joint')
+                    Covariate=mixed[,"Age"],
+                    missing_cutoff=0.15,
+                    MAF_Cutoff=NULL,
+                    MGC_Cutoff=20,
+                    kins=GRM,
+                    method='joint')
 }

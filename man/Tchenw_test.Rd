@@ -42,3 +42,10 @@ mean-based method: Tchenw for unrelated individuals, including a dominant effect
 Similar to the MTchen method, Tchenw is an approach designed for unrelated individuals and
 therefore does not incorporate a kinship matrix to account for correlations between individuals.
 }
+\examples{
+Tchenw_test(Genotype,Y,Sex,
+                      Covariate=unrelated[,"Age"],
+                      missing_cutoff=0.15,
+                      MAF_Cutoff=NULL,
+                      MGC_Cutoff=20)
+}
