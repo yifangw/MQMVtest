@@ -266,4 +266,3 @@ unre_results_2 = TcMV_test(Genotype = unrelated[,19],
 
 
 ```
-# MQMVtest

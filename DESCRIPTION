@@ -9,7 +9,7 @@ Authors@R: c(person("Yi-Fang", "Wei", email = "w12210152@i.smu.edu.cn", role = c
 Description: An R package of X chromosome-wide association studies for quantitative trait loci based on the mixture of general pedigrees and additional unrelated individuals. In this package, the nine methods (MQXcat, MQZmax, MTplink, MTchen, MwM3VNA, MQMVXcat, MQMVZmax, MpMV and McMV) can not only handle the mixed data but also be applied to only general pedigrees, where the latter case simply requires reducing the block matrix to a kinship matrix.
 License: GPL-3
 Encoding: UTF-8
-Imports: GMMAT, lmtest, quantreg, gJLS2, mvtnorm, expm, bigsnpr, xgboost
+Imports: GMMAT, lmtest, quantreg, mvtnorm, expm, bigsnpr, xgboost
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: R (>= 3.6.5)
